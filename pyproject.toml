@@ -1,0 +1,10 @@
+[project]
+name = "click-stream-pipeline"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pymongo>=4.17.0",
+    "redis>=8.0.1",
+]
