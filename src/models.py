@@ -16,6 +16,12 @@ class Topics(Enum):
     PRODUCTS = "products"
 
 
+class Collections(Enum):
+    PRODUCTS = "products"
+    USERS = "users"
+    CLICKS = "clicks"
+
+
 @dataclass(slots=True)
 class Click:
     user_id: ObjectId
