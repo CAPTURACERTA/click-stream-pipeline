@@ -15,7 +15,7 @@ class Publisher:
         except Exception as e:
             print(e)
         else:
-            click.processed_at = datetime.now().isoformat()
+            click.published_at = datetime.now().isoformat()
             click = dumps(click)
 
             target_topic = Topics.CLICKS.value

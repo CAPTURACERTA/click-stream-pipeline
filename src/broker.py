@@ -1,9 +1,6 @@
 import asyncio
-from typing import Protocol
 
-
-class Consumer(Protocol):
-    async def consume(self, message: str) -> None: ...
+from .models import Consumer
 
 
 class MessageBroker:
