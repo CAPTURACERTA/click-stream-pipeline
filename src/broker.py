@@ -1,6 +1,9 @@
 import asyncio
+import logging
 
 from .models import Consumer
+
+logger = logging.getLogger(__name__)
 
 
 class MessageBroker:

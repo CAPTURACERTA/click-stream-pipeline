@@ -1,3 +1,4 @@
 # to do
-- chance of fake data being wrong
-- log in every part printing the process
+- ask codex to add logging throughout the code
+- validation of data in consumers
+- **maybe** make broker receive bytes instead of str
