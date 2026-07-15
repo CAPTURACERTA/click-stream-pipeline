@@ -1,18 +1,17 @@
 import logging
-from datetime import datetime, timedelta, timezone
-from random import choice, randint, uniform
+from datetime import datetime, timezone
+from random import choice, uniform
 
 from faker import Faker
 
 from .models import Click, Product, User
-from .utils import select_data, simulate_latency
+from .utils import select_data
 
 fake = Faker()
 
 logger = logging.getLogger(__name__)
 
 
-@simulate_latency(chance=0.50, min_seconds=0.10, max_seconds=2.0)
 def generate_users(num_users: int = 10) -> list[User]:
     users = []
     for _ in range(num_users):
@@ -23,7 +22,6 @@ def generate_users(num_users: int = 10) -> list[User]:
     return users
 
 
-@simulate_latency(chance=0.50, min_seconds=0.10, max_seconds=2.0)
 def generate_products(num_products: int = 10) -> list[Product]:
     products = []
     for _ in range(num_products):
@@ -48,7 +46,6 @@ def generate_products(num_products: int = 10) -> list[Product]:
     return products
 
 
-@simulate_latency(chance=0.50, min_seconds=0.10, max_seconds=2.0)
 def generate_clicks(
     num_clicks: int, products: list[Product], users: list[User]
 ) -> list[Click]:
@@ -61,8 +58,7 @@ def generate_clicks(
             Click(
                 user_id=user_id,
                 product_id=product_id,
-                timestamp=datetime.now(timezone.utc)
-                - timedelta(minutes=randint(0, 60)),
+                created_at=datetime.now(timezone.utc),
             )
         )
 

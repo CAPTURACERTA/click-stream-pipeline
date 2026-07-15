@@ -77,18 +77,13 @@ def assert_valid_click(click: Click) -> None:
     _validate_object_id(click.user_id, "user_id")
     _validate_object_id(click.product_id, "product_id")
 
-    _validate_datetime(click.timestamp, "timestamp")
-    _validate_datetime(click.published_at, "published_at", allow_none=True)
+    _validate_datetime(click.created_at, "created_at")
     _validate_datetime(click.processed_at, "processed_at", allow_none=True)
-
-    if click.published_at is not None and click.published_at < click.timestamp:
-        logger.error("published_at cannot be earlier than timestamp.")
-        raise ValueError("published_at cannot be earlier than timestamp.")
 
     if (
         click.processed_at is not None
-        and click.published_at is not None
-        and click.processed_at < click.published_at
+        and click.created_at is not None
+        and click.processed_at < click.created_at
     ):
-        logger.error("processed_at cannot be earlier than published_at.")
-        raise ValueError("processed_at cannot be earlier than published_at.")
+        logger.error("processed_at cannot be earlier than created_at.")
+        raise ValueError("processed_at cannot be earlier than created_at.")

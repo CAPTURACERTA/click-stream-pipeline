@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -12,9 +13,12 @@ class Consumer(Protocol):
 
 
 class Topics(Enum):
-    CLICKS = "clicks"
-    USERS = "users"
-    PRODUCTS = "products"
+    CLICKS_RAW = "clicks:raw"
+    CLICKS_VALIDATED = "clicks:validated"
+    USERS_RAW = "users:raw"
+    USERS_VALIDATED = "users:validated"
+    PRODUCTS_RAW = "products:raw"
+    PRODUCTS_VALIDATED = "products:validated"
 
 
 class Collections(Enum):
@@ -23,12 +27,29 @@ class Collections(Enum):
     CLICKS = "clicks"
 
 
+class Data(ABC):
+    @abstractmethod
+    def to_dict(self) -> dict:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def from_dict(cls, data: dict):
+        pass
+
+    def to_json(self) -> str:
+        return dumps(self.to_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str):
+        return cls.from_dict(loads(json_str))
+
+
 @dataclass(slots=True)
-class Click:
+class Click(Data):
     user_id: ObjectId
     product_id: ObjectId
-    timestamp: datetime
-    published_at: datetime = field(default_factory=None)
+    created_at: datetime
     processed_at: datetime = field(default_factory=None)
     _id: ObjectId = field(default_factory=ObjectId)
 
@@ -36,51 +57,34 @@ class Click:
         return {
             "user_id": str(self.user_id),
             "product_id": str(self.product_id),
-            "timestamp": self.timestamp.isoformat(),
-            "published_at": self.published_at.isoformat()
-            if self.published_at
-            else None,
+            "created_at": self.created_at.isoformat(),
             "processed_at": self.processed_at.isoformat()
             if self.processed_at
             else None,
             "_id": str(self._id),
         }
 
-    def to_json(self):
-        return dumps(self.to_dict())
-
     @classmethod
     def from_dict(cls, data: dict):
         return Click(
             user_id=ObjectId(data["user_id"]),
             product_id=ObjectId(data["product_id"]),
-            timestamp=datetime.fromisoformat(data["timestamp"]),
-            published_at=datetime.fromisoformat(data["published_at"])
-            if data.get("published_at")
-            else None,
+            created_at=datetime.fromisoformat(data["created_at"]),
             processed_at=datetime.fromisoformat(data["processed_at"])
             if data.get("processed_at")
             else None,
             _id=ObjectId(data["_id"]) if data.get("_id") else ObjectId(),
         )
 
-    @classmethod
-    def from_json(cls, json_str: str):
-        data = loads(json_str)
-        return cls.from_dict(data)
-
 
 @dataclass(slots=True)
-class Product:
+class Product(Data):
     name: str
     price: float
     _id: ObjectId = field(default_factory=ObjectId)
 
     def to_dict(self):
         return {"name": self.name, "price": self.price, "_id": str(self._id)}
-
-    def to_json(self):
-        return dumps(self.to_dict())
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -90,22 +94,14 @@ class Product:
             _id=ObjectId(data["_id"]) if data.get("_id") else ObjectId(),
         )
 
-    @classmethod
-    def from_json(cls, json_str: str):
-        data = loads(json_str)
-        return cls.from_dict(data)
-
 
 @dataclass(slots=True)
-class User:
+class User(Data):
     name: str
     _id: ObjectId = field(default_factory=ObjectId)
 
     def to_dict(self):
         return {"name": self.name, "_id": str(self._id)}
-
-    def to_json(self):
-        return dumps(self.to_dict())
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -113,8 +109,3 @@ class User:
             name=data["name"],
             _id=ObjectId(data["_id"]) if data.get("_id") else ObjectId(),
         )
-
-    @classmethod
-    def from_json(cls, json_str: str):
-        data = loads(json_str)
-        return cls.from_dict(data)
