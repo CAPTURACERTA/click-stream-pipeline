@@ -2,6 +2,7 @@ import logging
 from pymongo.asynchronous.mongo_client import AsyncMongoClient
 
 from ..models import Data
+from ..utils import simulate_latency
 
 URI = "mongodb://localhost:27017/"
 DB_NAME = "e-commerce"
@@ -23,7 +24,8 @@ class Mongo:
         await self.client.aclose()
         logger.info("MongoDB connection closed.")
 
-    async def insert_one(self, collection: str, data: dict):
+    @simulate_latency()
+    async def insert_one(self, collection: str, data: dict) -> None:
         await self.db[collection].insert_one(data)
         logger.debug("Inserted document into MongoDB collection '%s'.", collection)
 

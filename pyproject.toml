@@ -1,7 +1,7 @@
 [project]
 name = "click-stream-pipeline"
 version = "0.1.0"
-description = "Add your description here"
+description = "Educational event-driven click-stream pipeline with MongoDB and Redis"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -9,3 +9,13 @@ dependencies = [
     "pymongo>=4.17.0",
     "redis>=8.0.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"

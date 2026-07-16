@@ -20,7 +20,11 @@ class ValidationConsumer(ABC):
 
     async def consume(self, message: str):
         try:
-            if self.validator is None or self.model is None or self.output_topic is None:
+            if (
+                self.validator is None
+                or self.model is None
+                or self.output_topic is None
+            ):
                 raise RuntimeError("Validation consumer is not configured.")
             type(self).validator(self.model.from_json(message))
         except (TypeError, ValueError) as e:
@@ -31,9 +35,8 @@ class ValidationConsumer(ABC):
             )
         except Exception as e:
             logger.exception(
-                "Unexpected error while validating %s event: %s",
+                "Unexpected error while validating %s event",
                 self.event_name,
-                e,
             )
         else:
             await self.publisher.publish(

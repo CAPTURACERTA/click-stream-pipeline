@@ -3,6 +3,8 @@ from json import loads
 
 import redis.asyncio as redis
 
+from ..utils import simulate_latency
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,6 +22,7 @@ class Redis:
         await self.client.aclose()
         logger.info("Redis connection closed.")
 
+    @simulate_latency()
     async def register_click(self, product_id: str, user_id: str) -> None:
         """Apply all click metrics atomically."""
         async with self.client.pipeline(transaction=True) as pipeline:
