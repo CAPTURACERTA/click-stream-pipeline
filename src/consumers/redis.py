@@ -18,15 +18,15 @@ class Redis:
 
     async def close(self):
         await self.client.aclose()
+        logger.info("Redis connection closed.")
 
-    async def incr_product_views(self, product_id: str):
-        await self.client.hincrby(f"products:{product_id}", "views", 1)
-
-    async def incr_user_clicks(self, user_id: str):
-        await self.client.hincrby(f"users:{user_id}", "clicks", 1)
-
-    async def incr_product_rank(self, product_id: str):
-        await self.client.zincrby("products:rank:views", 1, product_id)
+    async def register_click(self, product_id: str, user_id: str) -> None:
+        """Apply all click metrics atomically."""
+        async with self.client.pipeline(transaction=True) as pipeline:
+            pipeline.hincrby(f"products:{product_id}", "views", 1)
+            pipeline.hincrby(f"users:{user_id}", "clicks", 1)
+            pipeline.zincrby("products:rank:views", 1, product_id)
+            await pipeline.execute()
 
 
 class RedisConsumer:
@@ -39,6 +39,5 @@ class RedisConsumer:
     async def consume(self, message: str):
         click = loads(message)
 
-        await self.redis.incr_product_views(click["product_id"])
-        await self.redis.incr_user_clicks(click["user_id"])
-        await self.redis.incr_product_rank(click["product_id"])
+        await self.redis.register_click(click["product_id"], click["user_id"])
+        logger.debug("Updated Redis metrics for click '%s'.", click.get("_id"))

@@ -1,14 +1,15 @@
 import logging
 
 
-def setup_logging():
+def setup_logging() -> None:
     root_logger = logging.getLogger()
 
     root_logger.setLevel(logging.INFO)
 
     if not root_logger.handlers:
         formatter = logging.Formatter(
-            "%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+            "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
         )
 
         file_handler = logging.FileHandler("pipeline.log", mode="a", encoding="utf-8")

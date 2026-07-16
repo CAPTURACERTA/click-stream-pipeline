@@ -2,16 +2,14 @@ import logging
 from functools import wraps
 from random import random, uniform
 from time import sleep
-from typing import Callable
+from typing import Any, Callable
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logger = logging.getLogger(__name__)
 
 
 def select_data(
-    invalid_factory: Callable[[], any] | any,
-    valid_factory: Callable[[], any] | any,
+    invalid_factory: Callable[[], Any] | Any,
+    valid_factory: Callable[[], Any] | Any,
     probability_of_invalid: float = 0.05,
 ):
     if random() < probability_of_invalid:
@@ -28,8 +26,9 @@ def simulate_latency(
         def wrapper(*args, **kwargs):
             if random() < chance:
                 delay = uniform(min_seconds, max_seconds)
-                logging.warning(
-                    f"[LATÊNCIA SIMULADA] Gargalo na rede detectado. Atrasando {delay:.2f}s..."
+                logger.warning(
+                    "[SIMULATED LATENCY] Network bottleneck detected. Delaying by %.2fs...",
+                    delay,
                 )
                 sleep(delay)
             return func(*args, **kwargs)

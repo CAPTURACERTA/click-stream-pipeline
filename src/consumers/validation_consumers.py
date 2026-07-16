@@ -11,16 +11,18 @@ logger = logging.getLogger(__name__)
 
 class ValidationConsumer(ABC):
     event_name: str = ""
-    validator: Callable = None
-    model: Data = None
-    output_topic: Topics = None
+    validator: Callable[[Data], None] | None = None
+    model: type[Data] | None = None
+    output_topic: str | None = None
 
     def __init__(self, publisher: Publisher):
         self.publisher = publisher
 
     async def consume(self, message: str):
         try:
-            self.validator(self.model.from_json(message))
+            if self.validator is None or self.model is None or self.output_topic is None:
+                raise RuntimeError("Validation consumer is not configured.")
+            type(self).validator(self.model.from_json(message))
         except (TypeError, ValueError) as e:
             logger.warning(
                 "Discarding invalid %s event: %s",

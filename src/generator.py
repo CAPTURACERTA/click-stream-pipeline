@@ -19,6 +19,7 @@ def generate_users(num_users: int = 10) -> list[User]:
 
         users.append(User(name=name))
 
+    logger.info("Generated %d user events.", len(users))
     return users
 
 
@@ -43,6 +44,7 @@ def generate_products(num_products: int = 10) -> list[Product]:
             )
         )
 
+    logger.info("Generated %d product events.", len(products))
     return products
 
 
@@ -52,7 +54,7 @@ def generate_clicks(
     clicks = []
     for _ in range(num_clicks):
         user_id = select_data(None, lambda: choice(users)._id)
-        product_id = select_data(None, choice(products)._id)
+        product_id = select_data(None, lambda: choice(products)._id)
 
         clicks.append(
             Click(
@@ -62,4 +64,5 @@ def generate_clicks(
             )
         )
 
+    logger.info("Generated %d click events.", len(clicks))
     return clicks

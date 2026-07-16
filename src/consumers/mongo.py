@@ -1,7 +1,7 @@
 import logging
-from json import loads
-
 from pymongo.asynchronous.mongo_client import AsyncMongoClient
+
+from ..models import Data
 
 URI = "mongodb://localhost:27017/"
 DB_NAME = "e-commerce"
@@ -21,19 +21,23 @@ class Mongo:
 
     async def close(self):
         await self.client.aclose()
+        logger.info("MongoDB connection closed.")
 
     async def insert_one(self, collection: str, data: dict):
         await self.db[collection].insert_one(data)
+        logger.debug("Inserted document into MongoDB collection '%s'.", collection)
 
 
 class MongoConsumer:
     """Consumer class for MongoDB.\n
     Consumes products, users and clicks"""
 
-    def __init__(self, mongo: Mongo, collection: str):
+    def __init__(self, mongo: Mongo, collection: str, model: type[Data]):
         self.mongo = mongo
         self.collection = collection
+        self.model = model
 
     async def consume(self, message: str) -> None:
-        data = loads(message)
+        data = self.model.from_json(message).to_document()
         await self.mongo.insert_one(self.collection, data)
+        logger.debug("Persisted %s event in MongoDB.", self.model.__name__)

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
 from json import dumps, loads
@@ -40,6 +40,10 @@ class Data(ABC):
     def to_json(self) -> str:
         return dumps(self.to_dict())
 
+    def to_document(self) -> dict:
+        """Return a MongoDB-ready document, preserving native BSON-friendly types."""
+        return asdict(self)
+
     @classmethod
     def from_json(cls, json_str: str):
         return cls.from_dict(loads(json_str))
@@ -50,7 +54,7 @@ class Click(Data):
     user_id: ObjectId
     product_id: ObjectId
     created_at: datetime
-    processed_at: datetime = field(default_factory=None)
+    processed_at: datetime | None = None
     _id: ObjectId = field(default_factory=ObjectId)
 
     def to_dict(self):
@@ -80,7 +84,7 @@ class Click(Data):
 @dataclass(slots=True)
 class Product(Data):
     name: str
-    price: float
+    price: float | str | None
     _id: ObjectId = field(default_factory=ObjectId)
 
     def to_dict(self):
