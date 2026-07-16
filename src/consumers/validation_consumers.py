@@ -1,7 +1,8 @@
 import logging
 from abc import ABC
+from typing import Callable
 
-from ..models import Click, Product, Topics, User
+from ..models import Click, Data, Product, Topics, User
 from ..publisher import Publisher
 from ..validator import assert_valid_click, assert_valid_product, assert_valid_user
 
@@ -9,10 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class ValidationConsumer(ABC):
-    event_name = ""
-    validator = None
-    model = None
-    output_topic = None
+    event_name: str = ""
+    validator: Callable = None
+    model: Data = None
+    output_topic: Topics = None
 
     def __init__(self, publisher: Publisher):
         self.publisher = publisher
